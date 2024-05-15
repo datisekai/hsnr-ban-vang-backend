@@ -1,17 +1,17 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
-  Query,
 } from '@nestjs/common';
-import { FindOneOptions, ObjectId, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { CreateUserDto, EditUserDto, UserDto } from './user.dto';
 import { removeVietnameseDiacritics } from 'src/common/helpers';
+import { MongoRepository, Repository } from 'typeorm';
+import { CreateUserDto, EditUserDto } from './user.dto';
+import { User } from './user.entity';
+import { ObjectId } from 'mongodb';
 
 export interface UserFindOne {
-  _id?: ObjectId;
+  id?: string;
   email?: string;
 }
 
@@ -19,18 +19,14 @@ export interface UserFindOne {
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userRepository: MongoRepository<User>,
   ) {}
 
   async getMany(query: any) {
     const page = +query.page || 1;
     const limit = +query.limit || 10;
 
-    // .createQueryBuilder('user')
-    // .where('user.is_deleted = false')
-    // .take(limit)
-    // .skip((page - 1) * limit);
-    const where: any = { is_deleted: false };
+    const where: any = {};
 
     if (query.fullname) {
       where.fullname_search = new RegExp(
@@ -56,11 +52,8 @@ export class UserService {
     return { data, totalEntries, page, limit };
   }
 
-  async getOne(_id: ObjectId, userEntity?: User) {
-    console.log('getOne');
-    const user = await this.userRepository.findOne({
-      where: { _id, is_deleted: false },
-    });
+  async getOne(id: string, userEntity?: User) {
+    const user = await this.userRepository.findOneById(id);
 
     if (!user)
       throw new NotFoundException('User does not exists or unauthorized');
@@ -82,7 +75,6 @@ export class UserService {
       is_active: dto.is_active,
       password: dto.password,
       fullname_search: removeVietnameseDiacritics(dto.fullname),
-      is_deleted: false,
     });
     const user = await this.userRepository.save(newUser);
 
@@ -105,8 +97,8 @@ export class UserService {
     return user;
   }
 
-  async editOne(_id: ObjectId, dto: EditUserDto, userEntity?: User) {
-    const user = await this.getOne(_id, userEntity);
+  async editOne(id: string, dto: EditUserDto, userEntity?: User) {
+    const user = await this.getOne(id, userEntity);
     user.email = dto.email || user.email;
     if (dto.fullname) {
       user.fullname = dto.fullname;
@@ -128,15 +120,13 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async deleteOne(_id: ObjectId, userEntity?: User) {
-    const removedUser = await this.getOne(_id, userEntity);
-    removedUser.is_deleted = true;
-    return await this.userRepository.save(removedUser);
+  async deleteOne(id: string, userEntity?: User) {
+    return await this.userRepository.delete(id);
   }
 
   async findOne(data: UserFindOne) {
     return await this.userRepository.findOne({
-      where: { ...data, is_deleted: false },
+      where: { ...data },
     });
   }
 }

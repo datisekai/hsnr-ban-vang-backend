@@ -27,8 +27,8 @@ export class AuthService {
   }
 
   login(user: User) {
-    const { _id, ...rest } = user;
-    const payload = { sub: _id };
+    const { id, ...rest } = user;
+    const payload = { sub: id };
 
     delete user['password'];
 

@@ -1,5 +1,5 @@
 import { Controller, Post, Get, UseGuards, Body, Query } from '@nestjs/common';
-import { LocalAuthGuard } from './guards';
+import { JwtAuthGuard, LocalAuthGuard } from './guards';
 import { User, Auth } from 'src/common/decorators';
 import { User as UserEntity } from 'src/modules/user/user.entity';
 import { AuthService } from './auth.service';
@@ -58,7 +58,7 @@ export class AuthController {
   @Auth()
   @Post('check-token')
   async checkToken(@User() user: UserEntity) {
-    return true;
+    return { data: true };
   }
 
   // @Auth()

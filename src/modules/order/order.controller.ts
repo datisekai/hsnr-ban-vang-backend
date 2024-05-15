@@ -1,21 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
   Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
   Query,
 } from '@nestjs/common';
-import { Auth, User } from 'src/common/decorators';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RolesBuilder, InjectRolesBuilder } from 'nest-access-control';
-import { AppResource, AppRoles } from 'src/app.role';
-import { User as UserEntity } from '../user/user.entity';
-import { OrderService } from './order.service';
-import { ConfirmOrderDto, CreateOrderDto } from './order.dto';
+import { InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
+import { AppResource } from 'src/app.role';
+import { Auth } from 'src/common/decorators';
 import { ObjectId } from 'typeorm';
+import { CreateOrderDto } from './order.dto';
+import { OrderService } from './order.service';
 
 @ApiTags(AppResource.ORDER)
 @Controller('api.order')
@@ -32,6 +30,16 @@ export class OrderController {
   })
   async getMany(@Query() query) {
     return await this.orderService.getMany(query);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get Detail Order',
+  })
+  async getOne(@Param('id') id: string) {
+    console.log('id', id);
+    const data = await this.orderService.getOne(id);
+    return { data };
   }
 
   @Post()
@@ -52,7 +60,7 @@ export class OrderController {
   @ApiOperation({
     summary: 'Soft Delete Order',
   })
-  async deleteOne(@Param('id') id: ObjectId) {
+  async deleteOne(@Param('id') id: string) {
     let data;
 
     data = await this.orderService.deleteOne(id);

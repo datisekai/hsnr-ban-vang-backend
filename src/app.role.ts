@@ -60,6 +60,7 @@ roles
     AppResource.EPISODE,
     AppResource.UPLOAD,
     AppResource.ARTICLE,
+    AppResource.META,
   ])
   .updateAny([
     AppResource.USER,
@@ -67,6 +68,7 @@ roles
     AppResource.FILM,
     AppResource.EPISODE,
     AppResource.ARTICLE,
+    AppResource.META,
   ])
   .deleteAny([
     AppResource.USER,
@@ -74,4 +76,5 @@ roles
     AppResource.FILM,
     AppResource.EPISODE,
     AppResource.ARTICLE,
+    AppResource.META,
   ]);

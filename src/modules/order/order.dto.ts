@@ -25,6 +25,10 @@ export class OrderDto {
   @IsNotEmpty()
   send_username: string;
 
+  @ApiProperty()
+  @IsNumber()
+  send_server: number;
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -37,9 +41,3 @@ export class OrderDto {
 }
 
 export class CreateOrderDto extends OrderDto {}
-export class ConfirmOrderDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  zalo_trans_id: string;
-}

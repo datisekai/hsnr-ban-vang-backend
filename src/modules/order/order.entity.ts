@@ -4,6 +4,7 @@ import {
   Entity,
   ObjectId,
   ObjectIdColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderType, TransferType } from './order.constant';
@@ -11,7 +12,7 @@ import { OrderType, TransferType } from './order.constant';
 @Entity()
 export class Order {
   @ObjectIdColumn()
-  id: ObjectId;
+  id: string;
 
   @Column({ default: 0 })
   amount: number;
@@ -44,6 +45,9 @@ export class Order {
   send_username: string;
 
   @Column()
+  send_server: number;
+
+  @Column()
   secret_key: string;
 
   @Column({ nullable: true })
@@ -54,7 +58,4 @@ export class Order {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @Column({ default: false, select: false })
-  is_deleted: boolean;
 }

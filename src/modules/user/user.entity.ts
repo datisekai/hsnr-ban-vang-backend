@@ -10,6 +10,7 @@ import {
   OneToMany,
   ObjectIdColumn,
   ObjectId,
+  PrimaryColumn,
 } from 'typeorm';
 import { hash } from 'bcryptjs';
 
@@ -17,7 +18,7 @@ import { hash } from 'bcryptjs';
 @Unique(['email'])
 export class User {
   @ObjectIdColumn()
-  _id: ObjectId;
+  id: string;
 
   @Column()
   email: string;
@@ -36,9 +37,6 @@ export class User {
 
   @Column({ default: true })
   is_active: boolean;
-
-  @Column({ default: false, select: false })
-  is_deleted: boolean;
 
   @CreateDateColumn()
   created_at: Date;

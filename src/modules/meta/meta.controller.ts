@@ -23,7 +23,7 @@ export class MetaController {
 
   @Post()
   @ApiOperation({ summary: 'Create' })
-  @UseGuards(AuthGuard(), ACGuard)
+  @UseGuards(AuthGuard('jwt'), ACGuard)
   @UseRoles({
     resource: AppResource.META,
     action: 'create',
@@ -35,7 +35,7 @@ export class MetaController {
 
   @Put(':key')
   @ApiOperation({ summary: 'Update by key' })
-  @UseGuards(AuthGuard(), ACGuard)
+  @UseGuards(AuthGuard('jwt'), ACGuard)
   @UseRoles({
     resource: AppResource.META,
     action: 'update',
@@ -50,7 +50,7 @@ export class MetaController {
 
   @Delete(':key')
   @ApiOperation({ summary: 'Delete by key' })
-  @UseGuards(AuthGuard(), ACGuard)
+  @UseGuards(AuthGuard('jwt'), ACGuard)
   @UseRoles({
     resource: AppResource.META,
     action: 'delete',

@@ -57,7 +57,7 @@ export class UserController {
   @ApiOperation({
     summary: 'Get User By ID',
   })
-  async getOne(@Param('id') id: ObjectId) {
+  async getOne(@Param('id') id: string) {
     const data = await this.userService.getOne(id);
     return { data };
   }
@@ -87,7 +87,7 @@ export class UserController {
   })
   @Put(':id')
   async editOne(
-    @Param('id') id: ObjectId,
+    @Param('id') id: string,
     @Body() dto: EditUserDto,
     @User() user: UserEntity,
   ) {
@@ -111,7 +111,7 @@ export class UserController {
   @ApiOperation({
     summary: 'Soft Delete User',
   })
-  async deleteOne(@Param('id') id: ObjectId, @User() user: UserEntity) {
+  async deleteOne(@Param('id') id: string, @User() user: UserEntity) {
     let data;
 
     if (this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted) {
