@@ -58,7 +58,7 @@ export class OrderController {
   })
   @Delete(':id')
   @ApiOperation({
-    summary: 'Soft Delete Order',
+    summary: 'Delete Order',
   })
   async deleteOne(@Param('id') id: string) {
     let data;

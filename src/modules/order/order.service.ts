@@ -31,14 +31,14 @@ export class OrderService {
       where.created_at = { ...where.created_at, $lte: query.to };
     }
 
-    const [data, totalEntries] = await this.orderRepository.findAndCount({
+    const data = await this.orderRepository.find({
       where,
       order: { created_at: 'DESC' },
-      take: limit,
-      skip: (page - 1) * limit,
+      // take: limit,
+      // skip: (page - 1) * limit,
     });
 
-    return { data, totalEntries, page, limit };
+    return { data };
   }
 
   async createOne(dto: CreateOrderDto) {

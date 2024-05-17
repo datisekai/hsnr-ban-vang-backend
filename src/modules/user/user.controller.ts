@@ -109,7 +109,7 @@ export class UserController {
   })
   @Delete(':id')
   @ApiOperation({
-    summary: 'Soft Delete User',
+    summary: 'Delete User',
   })
   async deleteOne(@Param('id') id: string, @User() user: UserEntity) {
     let data;
