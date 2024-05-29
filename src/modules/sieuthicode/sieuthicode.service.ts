@@ -44,4 +44,11 @@ export class SieuThiCodeService {
       return [];
     }
   }
+
+  async getHistoryBySecretKeyAndFrom(secretKey: string, from?: string) {
+    const histories = await this.getHistoryMbbank('IN', from);
+    const bank = histories.find((item) => item.description.includes(secretKey));
+    console.log('existed', bank);
+    return bank;
+  }
 }

@@ -4,9 +4,20 @@ import { randomString } from 'src/common/helpers/randomString';
 import { MongoRepository, Repository } from 'typeorm';
 import { MetaService } from '../meta/meta.service';
 import { UserService } from '../user/user.service';
-import { OrderStatus, OrderType, TransferType } from './order.constant';
+import {
+  OrderStatus,
+  OrderType,
+  TransferStatus,
+  TransferType,
+} from './order.constant';
 import { CreateOrderDto } from './order.dto';
 import { Order } from './order.entity';
+import {
+  HistoryMbbank,
+  SieuThiCodeService,
+} from '../sieuthicode/sieuthicode.service';
+import { sleep } from 'src/common/helpers';
+import { HsnrService } from '../hsnr/hsnr.service';
 
 @Injectable()
 export class OrderService {
@@ -15,6 +26,8 @@ export class OrderService {
     private readonly orderRepository: MongoRepository<Order>,
     private readonly userService: UserService,
     private readonly metaService: MetaService,
+    private readonly sieuThiCodeService: SieuThiCodeService,
+    private readonly hsnrService: HsnrService,
   ) {}
 
   async getMany(query: any) {
@@ -83,5 +96,67 @@ export class OrderService {
     if (!order) throw new NotFoundException('Order');
 
     return order;
+  }
+
+  async confirmTransfer(id: string) {
+    const order = await this.getOne(id);
+    if (order.order_status !== OrderStatus.Pending) {
+      return TransferStatus.OutOfDate;
+    }
+
+    const fifteenMinutesInMilliseconds = 15 * 60 * 1000; // 15 phút = 900000 mili giây
+    const fifteenMinutesAfterOrderCreation = new Date(
+      order.created_at.getTime() + fifteenMinutesInMilliseconds,
+    );
+
+    if (new Date() > fifteenMinutesAfterOrderCreation) {
+      order.order_status = OrderStatus.Canceled;
+      await this.orderRepository.save(order);
+      return TransferStatus.OutOfDate;
+    }
+
+    let numLoop = 10;
+    let count = 0;
+    while (count < numLoop) {
+      count++;
+      console.log('check transaction', count);
+      const bank = await this.sieuThiCodeService.getHistoryBySecretKeyAndFrom(
+        order.secret_key,
+        // order.created_at.toISOString(),
+      );
+      if (bank) {
+        return await this.checkTransaction(order, bank);
+      }
+      await sleep(2000);
+    }
+
+    return TransferStatus.NotTransaction;
+  }
+
+  async checkTransaction(order: Order, bank: HistoryMbbank) {
+    if (+order.amount !== +bank.amount) {
+      console.log('wrong amount', bank.amount, order.amount);
+      order.order_status = OrderStatus.Wrong;
+      await this.orderRepository.save(order);
+      return TransferStatus.WrongAmount;
+    }
+
+    order.order_status = OrderStatus.Sending;
+    await this.orderRepository.save(order);
+
+    const payload = {
+      account: order.send_username,
+      server: order.send_server,
+      total: Math.floor((order.amount * order.multiplier) / 1000),
+    };
+
+    this.hsnrService.sendGold(
+      payload.account,
+      payload.total,
+      payload.server.toString(),
+    );
+
+    console.log('can submit send gold', payload);
+    return TransferStatus.Success;
   }
 }

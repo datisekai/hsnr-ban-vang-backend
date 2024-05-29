@@ -48,6 +48,7 @@ export class Captcha69Service {
     while (count < maxLoopCount) {
       count++;
       const text = await this.callRes(id);
+      console.log('getToken', count, text);
       if (text === 'CAPCHA_NOT_READY') {
         await sleep(timeSleep);
         continue;

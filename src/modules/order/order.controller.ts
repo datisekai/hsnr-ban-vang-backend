@@ -66,4 +66,13 @@ export class OrderController {
     data = await this.orderService.deleteOne(id);
     return { message: 'Order deleted', data };
   }
+
+  @Post('confirm/:id')
+  @ApiOperation({
+    summary: 'Confirm Transfer',
+  })
+  async confirm(@Param('id') id: string) {
+    const data = await this.orderService.confirmTransfer(id);
+    return { message: 'Confirmed', data };
+  }
 }

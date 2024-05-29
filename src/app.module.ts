@@ -13,6 +13,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { UserModule } from './modules/user/user.module';
 import { HsnrModule } from './modules/hsnr/hsnr.module';
 import { MetaModule } from './modules/meta/meta.module';
+import { SieuThiCodeModule } from './modules/sieuthicode/sieuthicode.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { MetaModule } from './modules/meta/meta.module';
     Captcha69Module,
     HsnrModule,
     MetaModule,
+    SieuThiCodeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
