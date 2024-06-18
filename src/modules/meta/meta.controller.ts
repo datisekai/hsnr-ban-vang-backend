@@ -10,6 +10,7 @@ import {
   Param,
   Get,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { MetaService } from './meta.service';
 import { CreateMetaDto, UpdateManyMetaDto, UpdateMetaDto } from './meta.dto';
@@ -63,6 +64,7 @@ export class MetaController {
   @Get('key/:key')
   @ApiOperation({ summary: 'Get by key' })
   async get(@Param('key') key: string) {
+    if (key == 'token') throw new NotFoundException(`meta`);
     return this.metaService.get(key);
   }
 }

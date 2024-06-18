@@ -4,6 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { TransferStatus } from '../order/order.constant';
 import * as fs from 'fs';
 import { HsnrDto } from '../order/order.dto';
+import { MetaService } from '../meta/meta.service';
 
 @Injectable()
 export class HsnrService {
@@ -15,6 +16,7 @@ export class HsnrService {
   constructor(
     private readonly capcha69Service: Captcha69Service,
     private readonly httpService: HttpService,
+    private readonly metaService: MetaService,
   ) {
     this.HSNR_URL = process.env.HSNR_URL;
     this.HSNR_USER = process.env.HSNR_USER;
@@ -45,7 +47,10 @@ export class HsnrService {
           'https://api.hoisinhngocrong.com/_api/game_account/login',
           payload,
         );
-        fs.writeFileSync('./token.txt', response.data.data.token);
+        // fs.writeFileSync('./token.txt', response.data.data.token);
+        await this.metaService.update('token', {
+          meta_value: response.data.data.token,
+        });
         return response.data.data.token;
       }
     }
@@ -53,13 +58,17 @@ export class HsnrService {
   }
 
   async sendGold(data: HsnrDto) {
-    console.log(`send gold ${data}`);
+    console.log(`send gold`, data);
     let token = '';
     try {
-      token = fs.readFileSync('./token.txt', 'utf8');
+      const metaToken = await this.metaService.get('token');
+      if (metaToken) {
+        token = metaToken.meta_value;
+      }
     } catch (error) {}
     if (!token) {
-      token = await this.login();
+      const tokenLogin = await this.login();
+      token = tokenLogin;
     }
     console.log('token hsnr', token);
     if (token) {
