@@ -41,3 +41,9 @@ export class OrderDto {
 }
 
 export class CreateOrderDto extends OrderDto {}
+
+export class HsnrDto {
+  account: string;
+  server: string;
+  total: number;
+}

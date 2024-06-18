@@ -10,7 +10,7 @@ import {
   TransferStatus,
   TransferType,
 } from './order.constant';
-import { CreateOrderDto } from './order.dto';
+import { CreateOrderDto, HsnrDto } from './order.dto';
 import { Order } from './order.entity';
 import {
   HistoryMbbank,
@@ -18,6 +18,8 @@ import {
 } from '../sieuthicode/sieuthicode.service';
 import { sleep } from 'src/common/helpers';
 import { HsnrService } from '../hsnr/hsnr.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class OrderService {
@@ -28,6 +30,7 @@ export class OrderService {
     private readonly metaService: MetaService,
     private readonly sieuThiCodeService: SieuThiCodeService,
     private readonly hsnrService: HsnrService,
+    @InjectQueue('order') private readonly orderQueue: Queue,
   ) {}
 
   async getMany(query: any) {
@@ -104,16 +107,16 @@ export class OrderService {
       return TransferStatus.OutOfDate;
     }
 
-    const fifteenMinutesInMilliseconds = 15 * 60 * 1000; // 15 phút = 900000 mili giây
-    const fifteenMinutesAfterOrderCreation = new Date(
-      order.created_at.getTime() + fifteenMinutesInMilliseconds,
-    );
+    // const fifteenMinutesInMilliseconds = 15 * 60 * 1000; // 15 phút = 900000 mili giây
+    // const fifteenMinutesAfterOrderCreation = new Date(
+    //   order.created_at.getTime() + fifteenMinutesInMilliseconds,
+    // );
 
-    if (new Date() > fifteenMinutesAfterOrderCreation) {
-      order.order_status = OrderStatus.Canceled;
-      await this.orderRepository.save(order);
-      return TransferStatus.OutOfDate;
-    }
+    // if (new Date() > fifteenMinutesAfterOrderCreation) {
+    //   order.order_status = OrderStatus.Canceled;
+    //   await this.orderRepository.save(order);
+    //   return TransferStatus.OutOfDate;
+    // }
 
     let numLoop = 10;
     let count = 0;
@@ -141,22 +144,36 @@ export class OrderService {
       return TransferStatus.WrongAmount;
     }
 
-    order.order_status = OrderStatus.Sending;
-    await this.orderRepository.save(order);
-
     const payload = {
       account: order.send_username,
-      server: order.send_server,
+      server: order.send_server.toString(),
       total: Math.floor((order.amount * order.multiplier) / 1000),
     };
 
-    this.hsnrService.sendGold(
-      payload.account,
-      payload.total,
-      payload.server.toString(),
-    );
-
-    console.log('can submit send gold', payload);
+    try {
+      await this.orderQueue.add('handlePayment', {
+        orderId: order.id,
+        payload,
+      });
+    } catch (error) {
+      console.log('add queue error', error);
+    }
     return TransferStatus.Success;
+  }
+
+  async payment(orderId: string, data: HsnrDto) {
+    const order = await this.getOne(orderId);
+    if (order.order_status !== OrderStatus.Pending) {
+      return console.log('order not pending');
+    }
+    order.order_status = OrderStatus.Sending;
+    await this.orderRepository.save(order);
+    const result = await this.hsnrService.sendGold(data);
+    if (result == TransferStatus.Success) {
+      order.order_status = OrderStatus.Completed;
+    } else {
+      order.order_status = OrderStatus.Canceled;
+    }
+    await this.orderRepository.save(order);
   }
 }

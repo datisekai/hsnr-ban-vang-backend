@@ -3,6 +3,7 @@ import { Captcha69Service } from '../captcha69/captcha69.service';
 import { HttpService } from '@nestjs/axios';
 import { TransferStatus } from '../order/order.constant';
 import * as fs from 'fs';
+import { HsnrDto } from '../order/order.dto';
 
 @Injectable()
 export class HsnrService {
@@ -51,8 +52,8 @@ export class HsnrService {
     return '';
   }
 
-  async sendGold(username: string, total: number, server: string) {
-    console.log(`send gold ${username}, ${total}, ${server}`);
+  async sendGold(data: HsnrDto) {
+    console.log(`send gold ${data}`);
     let token = '';
     try {
       token = fs.readFileSync('./token.txt', 'utf8');
@@ -62,11 +63,10 @@ export class HsnrService {
     }
     console.log('token hsnr', token);
     if (token) {
-      const payload = { account: username, total, server };
       try {
         await this.httpService.axiosRef.post(
           'https://api.hoisinhngocrong.com/_api/game_account/sendGold',
-          payload,
+          data,
           {
             headers: {
               Authorization: `${token}`,
@@ -76,9 +76,9 @@ export class HsnrService {
         return TransferStatus.Success;
       } catch (error) {
         console.log(error);
-        if (error.status == 401) {
+        if (error?.response?.status == 401) {
           await this.login();
-          return this.sendGold(username, total, server);
+          return this.sendGold(data);
         }
         return TransferStatus.SendGoldFail;
       }
