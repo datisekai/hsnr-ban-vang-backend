@@ -107,18 +107,23 @@ export class OrderService {
       return TransferStatus.OutOfDate;
     }
 
-    // const fifteenMinutesInMilliseconds = 15 * 60 * 1000; // 15 phút = 900000 mili giây
-    // const fifteenMinutesAfterOrderCreation = new Date(
-    //   order.created_at.getTime() + fifteenMinutesInMilliseconds,
-    // );
+    const fifteenMinutesInMilliseconds = 15 * 60 * 1000; // 15 phút = 900000 mili giây
+    const fifteenMinutesAfterOrderCreation = new Date(
+      order.created_at.getTime() + fifteenMinutesInMilliseconds,
+    );
 
-    // if (new Date() > fifteenMinutesAfterOrderCreation) {
-    //   order.order_status = OrderStatus.Canceled;
-    //   await this.orderRepository.save(order);
-    //   return TransferStatus.OutOfDate;
-    // }
+    if (new Date() > fifteenMinutesAfterOrderCreation) {
+      order.order_status = OrderStatus.Canceled;
+      await this.orderRepository.save(order);
+      return TransferStatus.OutOfDate;
+    }
 
-    let numLoop = 10;
+    this.actionCheck(order);
+    return TransferStatus.Success;
+  }
+
+  async actionCheck(order: Order) {
+    let numLoop = 20;
     let count = 0;
     while (count < numLoop) {
       count++;

@@ -29,7 +29,7 @@ export class TransactionsService {
   // Hàm giả lập kiểm tra giao dịch
   async checkTransactions() {
     const now = new Date();
-    const twoMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
+    const twoMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
     const histories = await this.sieuthicodeService.getHistoryMbbank(
       'IN',
       twoMinutesAgo.toISOString(),
@@ -49,6 +49,7 @@ export class TransactionsService {
 
   async payment(key: string, history: HistoryMbbank) {
     const order = await this.orderService.getBySecretKey(key);
+    console.log('payment', key, order);
     if (order && order.order_status === OrderStatus.Pending) {
       await this.orderService.checkTransaction(order, history);
     }
