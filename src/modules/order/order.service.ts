@@ -20,6 +20,7 @@ import { sleep } from 'src/common/helpers';
 import { HsnrService } from '../hsnr/hsnr.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { getMultiplier } from 'src/common/helpers/getMultiplier';
 
 @Injectable()
 export class OrderService {
@@ -64,7 +65,10 @@ export class OrderService {
     let multiplier = 1;
 
     if (metaData?.meta_value[`multiplier${dto.send_server}`]) {
-      multiplier = +metaData.meta_value[`multiplier${dto.send_server}`];
+      multiplier = getMultiplier(
+        dto.amount,
+        +metaData.meta_value[`multiplier${dto.send_server}`],
+      );
     }
 
     const order = await this.orderRepository.save({
