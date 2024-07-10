@@ -13,6 +13,7 @@ export class HsnrService {
   private HSNR_PASSWORD: string;
   private HSNR_SERVER: string;
   private HSNR_GOOGLE_KEY: string;
+  private lock = false;
   constructor(
     private readonly capcha69Service: Captcha69Service,
     private readonly httpService: HttpService,
@@ -26,6 +27,8 @@ export class HsnrService {
   }
 
   async login() {
+    if (this.lock) return console.log('login locked');
+    this.lock = true;
     console.log('login');
     const capchaId = await this.capcha69Service.getId(
       this.HSNR_GOOGLE_KEY,
@@ -34,6 +37,7 @@ export class HsnrService {
     console.log('get capchaId success', capchaId);
     if (capchaId) {
       const token = await this.capcha69Service.getToken(capchaId);
+      this.lock = false;
       console.log('captcha69 token', token);
       if (token) {
         const payload = {
@@ -47,6 +51,7 @@ export class HsnrService {
           'https://api.hoisinhngocrong.com/_api/game_account/login',
           payload,
         );
+        console.log('login success, update token', response.data.data.token);
         // fs.writeFileSync('./token.txt', response.data.data.token);
         await this.metaService.update('token', {
           meta_value: response.data.data.token,
@@ -73,7 +78,7 @@ export class HsnrService {
     console.log('token hsnr', token);
     if (token) {
       try {
-        await this.httpService.axiosRef.post(
+        const response = await this.httpService.axiosRef.post(
           'https://api.hoisinhngocrong.com/_api/game_account/sendGold',
           data,
           {
@@ -82,17 +87,47 @@ export class HsnrService {
             },
           },
         );
-        return TransferStatus.Success;
+        console.log(response);
+        if (response.data.code == 1) {
+          return TransferStatus.Success;
+        }
+        return TransferStatus.SendGoldFail;
       } catch (error) {
         console.log(error);
         if (error?.response?.status == 401) {
           await this.login();
-          return this.sendGold(data);
+          // return this.sendGold(data);
         }
         return TransferStatus.SendGoldFail;
       }
     }
 
     return TransferStatus.LoginFail;
+  }
+
+  async gameHistory() {
+    try {
+      let token = '';
+      const metaToken = await this.metaService.get('token');
+      if (metaToken) {
+        token = metaToken.meta_value;
+      }
+
+      if (!token) {
+        token = await this.login();
+      }
+      const response = await this.httpService.axiosRef.get(
+        'https://api.hoisinhngocrong.com/_api/game_history_goldbar/searchByMem?limit=50&offset=0',
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      return { data: response.data.data.rows };
+    } catch (error) {
+      console.log('gameHistory error', error);
+      return { data: [] };
+    }
   }
 }

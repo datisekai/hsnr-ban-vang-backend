@@ -25,6 +25,17 @@ export class HsnrController {
 
   @Get('login')
   async login() {
+    console.log('called login');
     return this.hsnrService.login();
+  }
+
+  @Get('game-history')
+  async gameHistory() {
+    return this.hsnrService.gameHistory();
+  }
+
+  @Post('test-send-gold')
+  async test(@Body() data: any) {
+    return this.hsnrService.sendGold(data);
   }
 }
