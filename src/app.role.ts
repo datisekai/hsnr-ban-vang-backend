@@ -26,6 +26,7 @@ export enum AppResource {
   FIREBASE = 'FIREBASE',
   HSNR = 'HSNR',
   META = 'META',
+  SIEUTHICODE='SIEUTHICODE'
 }
 
 export const roles: RolesBuilder = new RolesBuilder();

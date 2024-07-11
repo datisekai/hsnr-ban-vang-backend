@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { SieuThiCodeService } from './sieuthicode.service';
+import { SieuThiCodeController } from './sieuthicode.controller';
 
 @Module({
   imports: [
@@ -9,7 +10,7 @@ import { SieuThiCodeService } from './sieuthicode.service';
       maxRedirects: 5,
     }),
   ],
-  controllers: [],
+  controllers: [SieuThiCodeController],
   providers: [SieuThiCodeService],
   exports: [SieuThiCodeService],
 })
