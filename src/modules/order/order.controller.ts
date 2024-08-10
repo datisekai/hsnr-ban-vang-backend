@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -36,8 +37,26 @@ export class OrderController {
   @ApiOperation({
     summary: 'callback web hooks',
   })
-  async callbackWebhook(@Body() data: any) {
-    console.log('callbackWebhook', data);
+  async callbackWebhook1(@Body() data: any) {
+    console.log('callbackWebhook get', data);
+    return { success: true };
+  }
+
+  @Post('webhooks/callback')
+  @ApiOperation({
+    summary: 'callback web hooks',
+  })
+  async callbackWebhook2(@Body() data: any) {
+    console.log('callbackWebhook post', data);
+    return { success: true };
+  }
+
+  @Put('webhooks/callback')
+  @ApiOperation({
+    summary: 'callback web hooks',
+  })
+  async callbackWebhook3(@Body() data: any) {
+    console.log('callbackWebhook put', data);
     return { success: true };
   }
 
