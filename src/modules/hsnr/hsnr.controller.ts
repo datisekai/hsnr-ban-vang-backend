@@ -28,7 +28,8 @@ export class HsnrController {
   @Get('login')
   async login() {
     console.log('called login');
-    return this.hsnrService.login();
+    const response = await this.hsnrService.login();
+    return true;
   }
 
   @UseGuards(AuthGuard('jwt'), ACGuard)
