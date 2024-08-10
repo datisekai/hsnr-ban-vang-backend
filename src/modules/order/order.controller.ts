@@ -32,6 +32,15 @@ export class OrderController {
     return await this.orderService.getMany(query);
   }
 
+  @Get('webhooks/callback')
+  @ApiOperation({
+    summary: 'callback web hooks',
+  })
+  async callbackWebhook(@Body() data: any) {
+    console.log('callbackWebhook', data);
+    return { success: true };
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get Detail Order',
