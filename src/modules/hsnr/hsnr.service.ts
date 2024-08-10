@@ -54,7 +54,7 @@ export class HsnrService {
         console.log('login success, update token', response.data.data.token);
         // fs.writeFileSync('./token.txt', response.data.data.token);
         await this.metaService.update('token', {
-          meta_value: response.data.data.token,
+          meta_value: { token: response.data.data.token },
         });
         return response.data.data.token;
       }
@@ -68,7 +68,7 @@ export class HsnrService {
     try {
       const metaToken = await this.metaService.get('token');
       if (metaToken) {
-        token = metaToken.meta_value;
+        token = metaToken.meta_value.token;
       }
     } catch (error) {}
     if (!token) {
@@ -110,7 +110,7 @@ export class HsnrService {
       let token = '';
       const metaToken = await this.metaService.get('token');
       if (metaToken) {
-        token = metaToken.meta_value;
+        token = metaToken.meta_value.token;
       }
 
       if (!token) {

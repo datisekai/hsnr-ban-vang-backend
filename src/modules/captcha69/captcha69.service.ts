@@ -42,7 +42,7 @@ export class Captcha69Service {
   }
 
   async getToken(id: string) {
-    const maxLoopCount = 20;
+    const maxLoopCount = 40;
     let count = 0;
     const timeSleep = 5000; //ms
     while (count < maxLoopCount) {
