@@ -24,8 +24,11 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     // TypeOrmModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'mongodb',
-      url: process.env.MONGODB_URL,
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: [join(__dirname, '**', '*.entity.{ts,js}')],
       synchronize: true,
       autoLoadEntities: true,

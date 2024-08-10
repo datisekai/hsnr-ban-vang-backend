@@ -87,7 +87,7 @@ export class OrderService {
     return order;
   }
 
-  async deleteOne(id: string) {
+  async deleteOne(id: number) {
     return await this.orderRepository.delete(id);
   }
 
@@ -97,15 +97,15 @@ export class OrderService {
     });
   }
 
-  async getOne(id: string) {
-    const order = await this.orderRepository.findOneById(id);
+  async getOne(id: number) {
+    const order = await this.orderRepository.findOne({ where: { id } });
 
     if (!order) throw new NotFoundException('Order');
 
     return order;
   }
 
-  async confirmTransfer(id: string) {
+  async confirmTransfer(id: number) {
     const order = await this.getOne(id);
     if (order.order_status !== OrderStatus.Pending) {
       return TransferStatus.OutOfDate;
@@ -170,7 +170,7 @@ export class OrderService {
     return TransferStatus.Success;
   }
 
-  async payment(orderId: string, data: HsnrDto) {
+  async payment(orderId: number, data: HsnrDto) {
     const order = await this.getOne(orderId);
     if (order.order_status !== OrderStatus.Pending) {
       return console.log('order not pending');

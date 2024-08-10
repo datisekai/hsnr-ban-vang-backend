@@ -1,24 +1,20 @@
+import { hash } from 'bcryptjs';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  Unique,
-  CreateDateColumn,
-  UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  OneToMany,
-  ObjectIdColumn,
-  ObjectId,
-  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
 } from 'typeorm';
-import { hash } from 'bcryptjs';
 
 @Entity()
 @Unique(['email'])
 export class User {
-  @ObjectIdColumn()
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   email: string;

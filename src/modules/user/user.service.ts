@@ -52,7 +52,7 @@ export class UserService {
     return { data, totalEntries, page, limit };
   }
 
-  async getOne(id: string, userEntity?: User) {
+  async getOne(id: number, userEntity?: User) {
     const user = await this.userRepository.findOneById(id);
 
     if (!user)
@@ -97,7 +97,7 @@ export class UserService {
     return user;
   }
 
-  async editOne(id: string, dto: EditUserDto, userEntity?: User) {
+  async editOne(id: number, dto: EditUserDto, userEntity?: User) {
     const user = await this.getOne(id, userEntity);
     user.email = dto.email || user.email;
     if (dto.fullname) {

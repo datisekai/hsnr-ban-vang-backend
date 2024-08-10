@@ -4,14 +4,15 @@ import {
   PrimaryColumn,
   ObjectId,
   ObjectIdColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
 export class Meta {
-  @ObjectIdColumn()
-  id: ObjectId;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @PrimaryColumn()
+  @Column({ unique: true })
   meta_key: string;
 
   @Column({

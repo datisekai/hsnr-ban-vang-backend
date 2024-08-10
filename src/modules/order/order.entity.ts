@@ -5,14 +5,15 @@ import {
   ObjectId,
   ObjectIdColumn,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderType, TransferType } from './order.constant';
 
 @Entity()
 export class Order {
-  @ObjectIdColumn()
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ default: 0 })
   amount: number;

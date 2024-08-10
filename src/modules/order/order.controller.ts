@@ -38,7 +38,7 @@ export class OrderController {
   })
   async getOne(@Param('id') id: string) {
     console.log('id', id);
-    const data = await this.orderService.getOne(id);
+    const data = await this.orderService.getOne(+id);
     return { data };
   }
 
@@ -63,7 +63,7 @@ export class OrderController {
   async deleteOne(@Param('id') id: string) {
     let data;
 
-    data = await this.orderService.deleteOne(id);
+    data = await this.orderService.deleteOne(+id);
     return { message: 'Order deleted', data };
   }
 
@@ -72,7 +72,7 @@ export class OrderController {
     summary: 'Confirm Transfer',
   })
   async confirm(@Param('id') id: string) {
-    const data = await this.orderService.confirmTransfer(id);
+    const data = await this.orderService.confirmTransfer(+id);
     return { message: 'Confirmed', data };
   }
 }

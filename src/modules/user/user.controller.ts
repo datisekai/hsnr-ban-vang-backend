@@ -58,15 +58,15 @@ export class UserController {
     summary: 'Get User By ID',
   })
   async getOne(@Param('id') id: string) {
-    const data = await this.userService.getOne(id);
+    const data = await this.userService.getOne(+id);
     return { data };
   }
 
-  // @Auth({
-  //   possession: 'any',
-  //   action: 'create',
-  //   resource: AppResource.USER,
-  // })
+  @Auth({
+    possession: 'any',
+    action: 'create',
+    resource: AppResource.USER,
+  })
   @Post()
   @ApiOperation({
     summary: 'Create User',
@@ -94,10 +94,10 @@ export class UserController {
     let data;
 
     if (this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted) {
-      data = await this.userService.editOne(id, dto);
+      data = await this.userService.editOne(+id, dto);
     } else {
       const { roles, ...rest } = dto;
-      data = await this.userService.editOne(id, rest, user);
+      data = await this.userService.editOne(+id, rest, user);
     }
     return { message: 'User edited', data };
   }
