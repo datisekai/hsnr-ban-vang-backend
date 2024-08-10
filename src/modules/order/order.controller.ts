@@ -15,6 +15,7 @@ import { Auth } from 'src/common/decorators';
 import { ObjectId } from 'typeorm';
 import { CreateOrderDto } from './order.dto';
 import { OrderService } from './order.service';
+import { HistoryMbbank } from '../sieuthicode/sieuthicode.service';
 
 @ApiTags(AppResource.ORDER)
 @Controller('api.order')
@@ -33,30 +34,14 @@ export class OrderController {
     return await this.orderService.getMany(query);
   }
 
-  @Get('webhooks/callback')
-  @ApiOperation({
-    summary: 'callback web hooks',
-  })
-  async callbackWebhook1(@Body() data: any) {
-    console.log('callbackWebhook get', data);
-    return { success: true };
-  }
-
   @Post('webhooks/callback')
   @ApiOperation({
     summary: 'callback web hooks',
   })
   async callbackWebhook2(@Body() data: any) {
-    console.log('callbackWebhook post', data);
-    return { success: true };
-  }
-
-  @Put('webhooks/callback')
-  @ApiOperation({
-    summary: 'callback web hooks',
-  })
-  async callbackWebhook3(@Body() data: any) {
-    console.log('callbackWebhook put', data);
+    console.log('callbackWebhook post');
+    const histories = data.transactions as HistoryMbbank[];
+    this.orderService.handleWebhooks(histories);
     return { success: true };
   }
 
@@ -100,7 +85,7 @@ export class OrderController {
     summary: 'Confirm Transfer',
   })
   async confirm(@Param('id') id: string) {
-    const data = await this.orderService.confirmTransfer(+id);
-    return { message: 'Confirmed', data };
+    // const data = await this.orderService.confirmTransfer(+id);
+    return { message: 'Confirmed', data: {}, success: true };
   }
 }

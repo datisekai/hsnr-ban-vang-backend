@@ -45,6 +45,26 @@ export class SieuThiCodeService {
     }
   }
 
+  async getHistoryMbbankResponse(
+    histories: HistoryMbbank[],
+    type: 'IN' | 'OUT' | 'ALL' = 'ALL',
+    from?: string,
+  ): Promise<HistoryMbbank[]> {
+    let transactions = histories;
+    if (type !== 'ALL') {
+      transactions = transactions.filter((t) => t.type === type);
+    }
+
+    if (from) {
+      transactions = transactions.filter((t) => {
+        const transactionDates = t.transactionDate.split('/');
+        const dateString = `${transactionDates[1]}/${transactionDates[0]}/${transactionDates[2]}`;
+        return new Date(dateString) >= new Date(from);
+      });
+    }
+    return transactions;
+  }
+
   async getHistoryBySecretKeyAndFrom(secretKey: string, from?: string) {
     const histories = await this.getHistoryMbbank('IN', from);
     const bank = histories.find((item) => item.description.includes(secretKey));

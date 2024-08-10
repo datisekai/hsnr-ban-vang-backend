@@ -20,10 +20,9 @@ export class TransactionsService {
   // Định nghĩa cron job chạy mỗi 2 phút
   @Cron('0 */2 * * * *')
   handleCron() {
-    this.logger.debug('Running the cron job to check transactions');
-
+    // this.logger.debug('Running the cron job to check transactions');
     // Logic kiểm tra giao dịch tại đây
-    this.checkTransactions();
+    // this.checkTransactions();
   }
 
   // Hàm giả lập kiểm tra giao dịch
@@ -34,6 +33,20 @@ export class TransactionsService {
       'IN',
       twoMinutesAgo.toISOString(),
     );
+    if (histories && histories.length > 0) {
+      histories.forEach((history) => {
+        if (history.description.includes('KEY')) {
+          const key = getSecretKey(history.description);
+          console.log('GD', key);
+          if (key) {
+            this.payment(key, history);
+          }
+        }
+      });
+    }
+  }
+
+  async checkTransactionsWebhooks(histories: HistoryMbbank[]) {
     if (histories && histories.length > 0) {
       histories.forEach((history) => {
         if (history.description.includes('KEY')) {

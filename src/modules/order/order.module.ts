@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HsnrModule } from '../hsnr/hsnr.module';
 import { MetaModule } from '../meta/meta.module';
@@ -9,6 +9,7 @@ import { Order } from './order.entity';
 import { OrderService } from './order.service';
 import { OrderConsumer } from './order.consumer';
 import { BullModule } from '@nestjs/bull';
+import { TransactionModule } from '../transaction/transaction.module';
 
 @Module({
   imports: [

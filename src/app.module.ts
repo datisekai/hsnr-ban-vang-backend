@@ -51,7 +51,7 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     HsnrModule,
     MetaModule,
     SieuThiCodeModule,
-    TransactionModule,
+    // TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

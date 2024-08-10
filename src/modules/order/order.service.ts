@@ -21,6 +21,8 @@ import { HsnrService } from '../hsnr/hsnr.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { getMultiplier } from 'src/common/helpers/getMultiplier';
+import { TransactionsService } from '../transaction/transaction.service';
+import { getSecretKey } from 'src/common/helpers/getSecretKey';
 
 @Injectable()
 export class OrderService {
@@ -31,6 +33,7 @@ export class OrderService {
     private readonly metaService: MetaService,
     private readonly sieuThiCodeService: SieuThiCodeService,
     private readonly hsnrService: HsnrService,
+    // private readonly transactionService: TransactionsService,
     @InjectQueue('order') private readonly orderQueue: Queue,
   ) {}
 
@@ -145,6 +148,10 @@ export class OrderService {
     return TransferStatus.NotTransaction;
   }
 
+  async handleWebhooks(histories: HistoryMbbank[]) {
+    await this.checkTransactionsWebhooks(histories);
+  }
+
   async checkTransaction(order: Order, bank: HistoryMbbank) {
     if (+order.amount !== +bank.amount) {
       console.log('wrong amount', bank.amount, order.amount);
@@ -184,5 +191,27 @@ export class OrderService {
       order.order_status = OrderStatus.Canceled;
     }
     await this.orderRepository.save(order);
+  }
+
+  async checkTransactionsWebhooks(histories: HistoryMbbank[]) {
+    if (histories && histories.length > 0) {
+      histories.forEach((history) => {
+        if (history.description.includes('KEY')) {
+          const key = getSecretKey(history.description);
+          console.log('GD', key);
+          if (key) {
+            this.payment2(key, history);
+          }
+        }
+      });
+    }
+  }
+
+  async payment2(key: string, history: HistoryMbbank) {
+    const order = await this.getBySecretKey(key);
+    console.log('payment', key, order);
+    if (order && order.order_status === OrderStatus.Pending) {
+      await this.checkTransaction(order, history);
+    }
   }
 }
