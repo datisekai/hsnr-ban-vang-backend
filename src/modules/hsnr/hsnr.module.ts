@@ -4,6 +4,7 @@ import { HsnrService } from './hsnr.service';
 import { Captcha69Module } from '../captcha69/captcha69.module';
 import { HsnrController } from './hsnr.controller';
 import { MetaModule } from '../meta/meta.module';
+import { RecaptchaModule } from '../recaptcha/recaptcha.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MetaModule } from '../meta/meta.module';
     }),
     Captcha69Module,
     MetaModule,
+    RecaptchaModule,
   ],
   controllers: [HsnrController],
   providers: [HsnrService],

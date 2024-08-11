@@ -18,6 +18,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { UserModule } from './modules/user/user.module';
 import { TransactionsService } from './modules/transaction/transaction.service';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { RecaptchaModule } from './modules/recaptcha/recaptcha.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     HsnrModule,
     MetaModule,
     SieuThiCodeModule,
+    RecaptchaModule,
     // TransactionModule,
   ],
   controllers: [AppController],

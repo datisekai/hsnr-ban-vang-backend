@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Captcha69Service } from '../captcha69/captcha69.service';
 import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 
 export interface HistoryMbbank {
   transactionID: string;

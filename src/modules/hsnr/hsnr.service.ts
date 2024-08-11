@@ -5,6 +5,7 @@ import { TransferStatus } from '../order/order.constant';
 import * as fs from 'fs';
 import { HsnrDto } from '../order/order.dto';
 import { MetaService } from '../meta/meta.service';
+import { RecaptchaService } from '../recaptcha/recaptcha.service';
 
 @Injectable()
 export class HsnrService {
@@ -16,6 +17,7 @@ export class HsnrService {
   private lock = false;
   constructor(
     private readonly capcha69Service: Captcha69Service,
+    private readonly recaptchaService: RecaptchaService,
     private readonly httpService: HttpService,
     private readonly metaService: MetaService,
   ) {
@@ -30,13 +32,15 @@ export class HsnrService {
     if (this.lock) return console.log('login locked');
     this.lock = true;
     console.log('login');
-    const capchaId = await this.capcha69Service.getId(
+    const capchaId = await this.recaptchaService.getId(
       this.HSNR_GOOGLE_KEY,
       this.HSNR_URL,
     );
     console.log('get capchaId success', capchaId);
     if (capchaId) {
-      const token = await this.capcha69Service.getToken(capchaId);
+      console.time('get token');
+      const token = await this.recaptchaService.getToken(capchaId);
+      console.timeEnd('get token');
       this.lock = false;
       console.log('captcha69 token', token);
       if (token) {
