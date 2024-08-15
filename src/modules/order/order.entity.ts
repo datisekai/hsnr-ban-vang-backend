@@ -18,7 +18,7 @@ export class Order {
   @Column({ default: 0 })
   amount: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: 'decimal', precision: 6, scale: 2 })
   multiplier: number;
 
   @Column({
