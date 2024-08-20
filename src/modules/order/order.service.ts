@@ -209,7 +209,6 @@ export class OrderService {
 
   async payment2(key: string, history: HistoryMbbank) {
     const order = await this.getBySecretKey(key);
-    console.log('payment', key, order);
     if (order && order.order_status === OrderStatus.Pending) {
       await this.checkTransaction(order, history);
     }
