@@ -88,4 +88,13 @@ export class OrderController {
     // const data = await this.orderService.confirmTransfer(+id);
     return { message: 'Confirmed', data: {}, success: true };
   }
+
+  @Get('/check/canceled')
+  @ApiOperation({
+    summary: 'Check Orders',
+  })
+  async checkOrders() {
+    await this.orderService.checkOrders();
+    return { success: true };
+  }
 }

@@ -23,7 +23,14 @@ export class Order {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'sending', 'completed', 'canceled', 'wrong'],
+    enum: [
+      'pending',
+      'sending',
+      'completed',
+      'canceled',
+      'wrong',
+      'error_send_gold',
+    ],
     default: 'pending',
   })
   order_status: string;

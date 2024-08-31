@@ -8,6 +8,7 @@ export enum OrderStatus {
   Canceled = 'canceled',
   Wrong = 'wrong',
   Sending = 'sending',
+  ErrorSendGold = 'error_send_gold',
 }
 
 export enum TransferType {

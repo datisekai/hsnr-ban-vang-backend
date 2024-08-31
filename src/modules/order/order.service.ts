@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomString } from 'src/common/helpers/randomString';
-import { MongoRepository, Repository } from 'typeorm';
+import { In, LessThan, MongoRepository, Not, Repository } from 'typeorm';
 import { MetaService } from '../meta/meta.service';
 import { UserService } from '../user/user.service';
 import {
@@ -38,9 +38,6 @@ export class OrderService {
   ) {}
 
   async getMany(query: any) {
-    const page = +query.page || 1;
-    const limit = +query.limit || 10;
-
     const where: any = {};
 
     if (query.from) {
@@ -177,6 +174,33 @@ export class OrderService {
     return TransferStatus.Success;
   }
 
+  async canceled(orderId: number) {
+    const order = await this.getOne(orderId);
+
+    order.order_status = OrderStatus.Canceled;
+    await this.orderRepository.save(order);
+  }
+
+  async handleErrorSendGold(order: Order) {
+    order.order_status = OrderStatus.Pending;
+    await this.orderRepository.save(order);
+
+    const payload = {
+      account: order.send_username,
+      server: order.send_server.toString(),
+      total: Math.floor((order.amount * order.multiplier) / 1000),
+    };
+
+    try {
+      await this.orderQueue.add('handlePayment', {
+        orderId: order.id,
+        payload,
+      });
+    } catch (error) {
+      console.log('handleErrorSendGold', error);
+    }
+  }
+
   async payment(orderId: number, data: HsnrDto) {
     const order = await this.getOne(orderId);
     if (order.order_status !== OrderStatus.Pending) {
@@ -188,7 +212,7 @@ export class OrderService {
     if (result == TransferStatus.Success) {
       order.order_status = OrderStatus.Completed;
     } else {
-      order.order_status = OrderStatus.Canceled;
+      order.order_status = OrderStatus.ErrorSendGold;
     }
     await this.orderRepository.save(order);
   }
@@ -212,5 +236,31 @@ export class OrderService {
     if (order && order.order_status === OrderStatus.Pending) {
       await this.checkTransaction(order, history);
     }
+  }
+
+  async checkOrders() {
+    const now = new Date();
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+
+    const orders = await this.orderRepository.find({
+      where: {
+        created_at: LessThan(fifteenMinutesAgo),
+        order_status: OrderStatus.Pending,
+      },
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    await this.orderRepository.update(
+      {
+        id: In(orders.map((item) => item.id)),
+      },
+      {
+        order_status: OrderStatus.Canceled,
+      },
+    );
+
+    return true;
   }
 }

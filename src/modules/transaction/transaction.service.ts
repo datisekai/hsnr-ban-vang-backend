@@ -7,6 +7,7 @@ import {
   SieuThiCodeService,
 } from 'src/modules/sieuthicode/sieuthicode.service';
 import { OrderStatus } from '../order/order.constant';
+import { MoreThanOrEqual } from 'typeorm';
 
 @Injectable()
 export class TransactionsService {
@@ -18,11 +19,34 @@ export class TransactionsService {
   ) {}
 
   // Định nghĩa cron job chạy mỗi 2 phút
-  @Cron('0 */2 * * * *')
+  @Cron('0 */5 * * * *')
   handleCron() {
-    // this.logger.debug('Running the cron job to check transactions');
+    this.logger.debug('Running the cron job to check transactions');
     // Logic kiểm tra giao dịch tại đây
     // this.checkTransactions();
+  }
+
+  async checkOrders() {
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60000);
+    const { data } = await this.orderService.getMany({
+      order_status: OrderStatus.ErrorSendGold,
+      created_at: MoreThanOrEqual(fifteenMinutesAgo),
+    });
+
+    const fifteenMinutesInMilliseconds = 15 * 60 * 1000; // 15 phút = 900000 mili giây
+
+    if (data && data?.length > 0) {
+      for (const order of data) {
+        const fifteenMinutesAfterOrderCreation = new Date(
+          order.created_at.getTime() + fifteenMinutesInMilliseconds,
+        );
+        if (new Date() <= fifteenMinutesAfterOrderCreation) {
+          await this.orderService.handleErrorSendGold(order);
+        } else {
+          await this.orderService.canceled(order.id);
+        }
+      }
+    }
   }
 
   // Hàm giả lập kiểm tra giao dịch
