@@ -16,7 +16,7 @@ import { GoogleAuthService } from './google-auth.service';
     JwtModule.registerAsync({
       useFactory: () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '2h' },
+        signOptions: { expiresIn: '7d' },
       }),
     }),
     UserModule,
