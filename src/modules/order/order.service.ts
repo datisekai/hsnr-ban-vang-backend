@@ -245,7 +245,7 @@ export class OrderService {
     const orders = await this.orderRepository.find({
       where: {
         created_at: LessThan(fifteenMinutesAgo),
-        order_status: OrderStatus.Pending,
+        order_status: In([OrderStatus.Pending, OrderStatus.ErrorSendGold]),
       },
       order: {
         created_at: 'DESC',

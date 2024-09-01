@@ -23,7 +23,7 @@ export class TransactionsService {
   handleCron() {
     this.logger.debug('Running the cron job to check transactions');
     // Logic kiểm tra giao dịch tại đây
-    // this.checkTransactions();
+    this.checkTransactions();
   }
 
   async checkOrders() {
