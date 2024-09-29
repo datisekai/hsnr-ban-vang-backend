@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
 } from 'class-validator';
 import { OrderType, TransferType } from './order.constant';
 
@@ -19,6 +20,11 @@ export class OrderDto {
   @IsEnum(TransferType, { message: 'Invalid transfer type' })
   @IsOptional()
   transfer_type?: TransferType = TransferType.MBBANK;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  recaptcha: string;
 
   @ApiProperty()
   @IsString()
@@ -37,6 +43,7 @@ export class OrderDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
+  @Max(1000001)
   amount: number;
 }
 

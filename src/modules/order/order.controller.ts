@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -16,12 +17,14 @@ import { ObjectId } from 'typeorm';
 import { CreateOrderDto } from './order.dto';
 import { OrderService } from './order.service';
 import { HistoryMbbank } from '../sieuthicode/sieuthicode.service';
+import { CaptchaService } from '../captcha/captcha.service';
 
 @ApiTags(AppResource.ORDER)
 @Controller('api.order')
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
+    private readonly captchaService: CaptchaService,
     @InjectRolesBuilder()
     private readonly rolesBuilder: RolesBuilder,
   ) {}
@@ -60,6 +63,13 @@ export class OrderController {
     summary: 'Create Order',
   })
   async createOne(@Body() dto: CreateOrderDto) {
+    const trueCaptcha = await this.captchaService.validateCaptcha(
+      dto.recaptcha,
+    );
+    if (!trueCaptcha) {
+      throw new NotFoundException('Captcha invalid');
+    }
+
     const data = await this.orderService.createOne(dto);
     return { message: 'Order created', data };
   }

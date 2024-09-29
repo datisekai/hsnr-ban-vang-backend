@@ -10,6 +10,7 @@ import { OrderService } from './order.service';
 import { OrderConsumer } from './order.consumer';
 import { BullModule } from '@nestjs/bull';
 import { TransactionModule } from '../transaction/transaction.module';
+import { CaptchaModule } from '../captcha/captcha.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TransactionModule } from '../transaction/transaction.module';
     MetaModule,
     SieuThiCodeModule,
     HsnrModule,
+    CaptchaModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderConsumer],

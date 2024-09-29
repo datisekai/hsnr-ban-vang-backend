@@ -23,6 +23,7 @@ import { Queue } from 'bull';
 import { getMultiplier } from 'src/common/helpers/getMultiplier';
 import { TransactionsService } from '../transaction/transaction.service';
 import { getSecretKey } from 'src/common/helpers/getSecretKey';
+import { CaptchaService } from '../captcha/captcha.service';
 
 @Injectable()
 export class OrderService {
@@ -33,6 +34,7 @@ export class OrderService {
     private readonly metaService: MetaService,
     private readonly sieuThiCodeService: SieuThiCodeService,
     private readonly hsnrService: HsnrService,
+    private readonly captchaService: CaptchaService,
     // private readonly transactionService: TransactionsService,
     @InjectQueue('order') private readonly orderQueue: Queue,
   ) {}
@@ -59,6 +61,8 @@ export class OrderService {
   }
 
   async createOne(dto: CreateOrderDto) {
+    console.log('called');
+
     const secret_key = randomString(6);
     const metaData = await this.metaService.get('setting_data');
 

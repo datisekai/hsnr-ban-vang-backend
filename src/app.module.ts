@@ -19,6 +19,7 @@ import { UserModule } from './modules/user/user.module';
 import { TransactionsService } from './modules/transaction/transaction.service';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { RecaptchaModule } from './modules/recaptcha/recaptcha.module';
+import { CaptchaModule } from './modules/captcha/captcha.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { RecaptchaModule } from './modules/recaptcha/recaptcha.module';
     MetaModule,
     SieuThiCodeModule,
     RecaptchaModule,
+    CaptchaModule,
     // TransactionModule,
   ],
   controllers: [AppController],
