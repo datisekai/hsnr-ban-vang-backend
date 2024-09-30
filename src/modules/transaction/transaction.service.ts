@@ -61,7 +61,6 @@ export class TransactionsService {
       histories.forEach((history) => {
         if (history.description.includes('KEY')) {
           const key = getSecretKey(history.description);
-          console.log('GD', key);
           if (key) {
             this.payment(key, history);
           }
@@ -75,7 +74,6 @@ export class TransactionsService {
       histories.forEach((history) => {
         if (history.description.includes('KEY')) {
           const key = getSecretKey(history.description);
-          console.log('GD', key);
           if (key) {
             this.payment(key, history);
           }

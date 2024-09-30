@@ -37,31 +37,35 @@ export class HsnrService {
       this.HSNR_URL,
     );
     console.log('get capchaId success', capchaId);
-    if (capchaId) {
-      console.time('get token');
-      const token = await this.recaptchaService.getToken(capchaId);
-      console.timeEnd('get token');
-      this.lock = false;
-      console.log('captcha69 token', token);
-      if (token) {
-        const payload = {
-          username: this.HSNR_USER,
-          password: this.HSNR_PASSWORD,
-          server: this.HSNR_SERVER,
-          captcha: token,
-        };
-        console.log('payload login', payload);
-        const response = await this.httpService.axiosRef.post(
-          'https://api.hoisinhngocrong.com/_api/game_account/login',
-          payload,
-        );
-        console.log('login success, update token', response.data.data.token);
-        // fs.writeFileSync('./token.txt', response.data.data.token);
-        await this.metaService.update('token', {
-          meta_value: { token: response.data.data.token },
-        });
-        return response.data.data.token;
+    try {
+      if (capchaId) {
+        console.time('get token');
+        const token = await this.recaptchaService.getToken(capchaId);
+        console.timeEnd('get token');
+        console.log('captcha69 token', token);
+        if (token) {
+          const payload = {
+            username: this.HSNR_USER,
+            password: this.HSNR_PASSWORD,
+            server: this.HSNR_SERVER,
+            captcha: token,
+          };
+          console.log('payload login', payload);
+          const response = await this.httpService.axiosRef.post(
+            'https://api.hoisinhngocrong.com/_api/game_account/login',
+            payload,
+          );
+          console.log('login success, update token', response.data.data.token);
+          // fs.writeFileSync('./token.txt', response.data.data.token);
+          await this.metaService.update('token', {
+            meta_value: { token: response.data.data.token },
+          });
+          return response.data.data.token;
+        }
       }
+    } catch (error) {
+    } finally {
+      this.lock = false;
     }
     return '';
   }

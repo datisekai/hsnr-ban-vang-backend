@@ -226,7 +226,6 @@ export class OrderService {
       histories.forEach((history) => {
         if (history.description.includes('KEY')) {
           const key = getSecretKey(history.description);
-          console.log('GD', key);
           if (key) {
             this.payment2(key, history);
           }
