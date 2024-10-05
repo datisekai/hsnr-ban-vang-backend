@@ -1,7 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomString } from 'src/common/helpers/randomString';
-import { In, LessThan, MongoRepository, Not, Repository } from 'typeorm';
+import {
+  In,
+  LessThan,
+  LessThanOrEqual,
+  MongoRepository,
+  MoreThanOrEqual,
+  Not,
+  Repository,
+} from 'typeorm';
 import { MetaService } from '../meta/meta.service';
 import { UserService } from '../user/user.service';
 import {
@@ -40,22 +48,25 @@ export class OrderService {
   ) {}
 
   async getMany(query: any) {
-    const where: any = {};
+    const queryBuilder = this.orderRepository.createQueryBuilder('order');
 
+    // Nếu có 'from', thêm điều kiện WHERE cho 'created_at'
     if (query.from) {
-      where.created_at = { ...where.created_at, $gte: query.from };
+      const fromDate = new Date(query.from); // Chuyển đổi chuỗi thành Date
+      queryBuilder.andWhere('order.created_at >= :from', { from: fromDate });
     }
 
+    // Nếu có 'to', thêm điều kiện WHERE cho 'created_at'
     if (query.to) {
-      where.created_at = { ...where.created_at, $lte: query.to };
+      const toDate = new Date(query.to); // Chuyển đổi chuỗi thành Date
+      queryBuilder.andWhere('order.created_at <= :to', { to: toDate });
     }
 
-    const data = await this.orderRepository.find({
-      where,
-      order: { created_at: 'DESC' },
-      // take: limit,
-      // skip: (page - 1) * limit,
-    });
+    // Sắp xếp theo 'created_at' giảm dần (DESC)
+    queryBuilder.orderBy('order.created_at', 'DESC');
+
+    // Thực hiện truy vấn và lấy kết quả
+    const data = await queryBuilder.getMany();
 
     return { data };
   }
