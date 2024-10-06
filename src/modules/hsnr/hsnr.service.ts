@@ -71,9 +71,13 @@ export class HsnrService {
   }
 
   async sendGold(data: HsnrDto) {
-    console.log(`send gold`, data);
     let token = '';
     try {
+      const setting = await this.metaService.get('setting_data');
+      if (setting.meta_value && setting.meta_value['stop_send_tv']) {
+        return;
+      }
+      console.log(`send gold`, data);
       const metaToken = await this.metaService.get('token');
       if (metaToken) {
         token = metaToken.meta_value.token;
