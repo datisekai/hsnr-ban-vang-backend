@@ -7,7 +7,7 @@ import { SieuThiCodeModule } from '../sieuthicode/sieuthicode.module';
 @Module({
   imports: [SieuThiCodeModule, forwardRef(() => OrderModule)],
   controllers: [],
-  providers: [TransactionsService],
-  exports: [TransactionsService],
+  providers: [],
+  exports: [],
 })
 export class TransactionModule {}

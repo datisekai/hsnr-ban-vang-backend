@@ -172,6 +172,10 @@ export class OrderService {
       return TransferStatus.WrongAmount;
     }
 
+    if (order.order_status != OrderStatus.Pending) {
+      return TransferStatus.SendGoldFail;
+    }
+
     const payload = {
       account: order.send_username,
       server: order.send_server.toString(),
