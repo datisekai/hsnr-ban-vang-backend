@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ObjectId,
   ObjectIdColumn,
   PrimaryColumn,
@@ -11,6 +12,7 @@ import {
 import { OrderType, TransferType } from './order.constant';
 
 @Entity()
+@Index('secret_key', ['secret_key'], { unique: true })
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
