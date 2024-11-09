@@ -32,7 +32,7 @@ export class HsnrController {
     return true;
   }
 
-  @UseGuards(AuthGuard('jwt'), ACGuard)
+  // @UseGuards(AuthGuard('jwt'), ACGuard)
   @Get('game-history')
   async gameHistory() {
     return this.hsnrService.gameHistory();

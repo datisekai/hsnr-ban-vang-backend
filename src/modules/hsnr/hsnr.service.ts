@@ -52,9 +52,15 @@ export class HsnrService {
           };
           console.log('payload login', payload);
           const response = await this.httpService.axiosRef.post(
-            'https://api.hoisinhngocrong.com/_api/game_account/login',
+            'https://hoisinhngocrong.com/_api/game_account/login',
             payload,
+            {
+              headers:{
+                Cookie: 'vfw=8c0c08aaf5080e371c0d0722039216a3'
+              }
+            }
           );
+          console.log('response header', response.headers)
           console.log('login success, update token', response.data.data.token);
           // fs.writeFileSync('./token.txt', response.data.data.token);
           await this.metaService.update('token', {
@@ -91,11 +97,12 @@ export class HsnrService {
     if (token) {
       try {
         const response = await this.httpService.axiosRef.post(
-          'https://api.hoisinhngocrong.com/_api/game_account/sendGold',
+          'https://hoisinhngocrong.com/_api/game_account/sendGold',
           data,
           {
             headers: {
               Authorization: `${token}`,
+              Cookie: 'vfw=8c0c08aaf5080e371c0d0722039216a3'
             },
           },
         );
@@ -129,10 +136,11 @@ export class HsnrService {
         token = await this.login();
       }
       const response = await this.httpService.axiosRef.get(
-        'https://api.hoisinhngocrong.com/_api/game_history_goldbar/searchByMem?limit=50&offset=0',
+        'https://hoisinhngocrong.com/_api/game_history_goldbar/searchByMem?limit=50&offset=0',
         {
           headers: {
             Authorization: token,
+            Cookie: 'vfw=8c0c08aaf5080e371c0d0722039216a3'
           },
         },
       );
