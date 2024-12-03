@@ -14,6 +14,8 @@ export class HsnrService {
   private HSNR_PASSWORD: string;
   private HSNR_SERVER: string;
   private HSNR_GOOGLE_KEY: string;
+  private HARD_CAPTCHA: string;
+  private HARD_CAPTCHA2: string;
   private lock = false;
   constructor(
     private readonly capcha69Service: Captcha69Service,
@@ -26,6 +28,8 @@ export class HsnrService {
     this.HSNR_PASSWORD = process.env.HSNR_PASSWORD;
     this.HSNR_SERVER = process.env.HSNR_SERVER;
     this.HSNR_GOOGLE_KEY = process.env.HSNR_GOOGLE_KEY;
+    this.HARD_CAPTCHA = process.env.HARD_CAPTCHA;
+    this.HARD_CAPTCHA2 = process.env.HARD_CAPTCHA2;
   }
 
   async login() {
@@ -76,6 +80,30 @@ export class HsnrService {
     return '';
   }
 
+  async login2() {
+    try {
+      const payload = {
+        username: this.HSNR_USER,
+        password: this.HSNR_PASSWORD,
+        server: this.HSNR_SERVER,
+        captcha: this.HARD_CAPTCHA,
+        _captcha: this.HARD_CAPTCHA2,
+      };
+      console.log('payload login', payload);
+      const response = await this.httpService.axiosRef.post(
+        'https://api1.hoisinhngocrong.com/_api/game_account/login',
+        payload,
+      );
+      console.log('login success, update token', response.data.data.token);
+      // fs.writeFileSync('./token.txt', response.data.data.token);
+      await this.metaService.update('token', {
+        meta_value: { token: response.data.data.token },
+      });
+      return response.data.data.token;
+    } catch (error) {
+      return '';
+    }
+  }
   async sendGold(data: HsnrDto) {
     let token = '';
     try {
@@ -90,7 +118,7 @@ export class HsnrService {
       }
     } catch (error) {}
     if (!token) {
-      const tokenLogin = await this.login();
+      const tokenLogin = await this.login2();
       token = tokenLogin;
     }
     console.log('token hsnr', token);
@@ -114,7 +142,7 @@ export class HsnrService {
       } catch (error) {
         console.log(error);
         if (error?.response?.status == 401) {
-          await this.login();
+          await this.login2();
           // return this.sendGold(data);
         }
         return TransferStatus.SendGoldFail;
@@ -133,7 +161,7 @@ export class HsnrService {
       }
 
       if (!token) {
-        token = await this.login();
+        token = await this.login2();
       }
       const response = await this.httpService.axiosRef.get(
         'https://api1.hoisinhngocrong.com/_api/game_history_goldbar/searchByMem?limit=50&offset=0',

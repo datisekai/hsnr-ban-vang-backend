@@ -28,7 +28,7 @@ export class HsnrController {
   @Get('login')
   async login() {
     console.log('called login');
-    const response = await this.hsnrService.login();
+    const response = await this.hsnrService.login2();
     return true;
   }
 
